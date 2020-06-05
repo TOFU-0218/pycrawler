@@ -9,6 +9,7 @@ def get_html(url, params=None,headers=None):
     """get_html
     url:データを取得するサイトのURL
     [params]:検索サイトのパラメーター {x: param}
+    [headers]:ユーザーエージェント
     """
     try:
         #データ取得
@@ -19,20 +20,37 @@ def get_html(url, params=None,headers=None):
     except Exception as e:
         return None
 
+def get_search_url(word, engine="google"):
+    """get_search_url
+    word: 検索するワード
+    [engine]: 使用する検索サイト（デフォルトは google）
+    """
+    try:
+        if engine == "google":
+            #google 検索
+            search_url = "https://www.google.co.jp/search"
+            search_params = {"q": "python"}
+            search_headers = {"User-Agent": user_agent}
+            #データ取得
+            soup = get_html(search_url, search_params, search_headers)
+            if soup != None:
+                tags = soup.select(".r > a")
+                urls = [tag.get("href") for tag in tags]
+                return urls
+            else:
+                return None
+        else:
+            return None
+    except Exception as e:
+        return None
+
 
 try:
-    #urlを代入
-    search_url = "https://www.google.co.jp/search"
-    search_params = {"q": "python"}
-    search_headers = {"User-Agent": user_agent}
-    #データ取得
-    soup = get_html(search_url, search_params,search_headers)
-    if soup != None:
-        tags = soup.select(".r > a")
-        for tag in tags:
-            print(tag.get("href"))
+    result = get_search_url("python")
+    if result != None:
+        for url in result:
+            print(url)
     else:
         print("取得できませんでした")
-    
 except Exception as e:
     print("エラーになりました")
